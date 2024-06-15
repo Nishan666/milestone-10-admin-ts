@@ -1,14 +1,28 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable react/prop-types */
-export const Product = ({ item, handleEditProduct , handleRemove }) => {
+export const Product = ({ item, handleEditProduct, handleRemove }) => {
   const cleanUrlString = (url) => {
     return url.replace(/^\[\"|\"\]$/g, "");
   };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <tr className="border-b dark:border-gray-700">
-      <th
+      <td className="px-6 py-4 w-4">
+        <span className="rounded-lg bg-green-200 px-2.5 py-0.5 text-xs font-extrabold">
+          {item.id}
+        </span>
+      </td>
+      <td
         scope="row"
-        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white flex items-center"
+        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white flex items-center w-1/3"
       >
         <img
           src={cleanUrlString(item.images[0])}
@@ -22,18 +36,21 @@ export const Product = ({ item, handleEditProduct , handleRemove }) => {
         <span className="text-base text-gray-900 font-semibold">
           {item.title}
         </span>
-      </th>
-      <td className="px-6 py-4 font-medium text-gray-900">
+      </td>
+      <td className="px-6 py-4 font-medium text-gray-900 ">
         {item.category.name}
       </td>
-      <td className="px-6 py-4 font-medium text-gray-900">${item.price}</td>
-      <td className="px-6 py-4">
-        <span className="rounded-lg bg-green-200 px-2.5 py-0.5 text-xs font-extrabold">
-          {item.id}
-        </span>
+      <td className="px-6 py-4 font-medium text-gray-900 ">${item.price}</td>
+
+      <td className="px-6 py-4 font-medium text-gray-900 ">
+        {formatDate(item.creationAt)}
       </td>
-      <td className="px-6 py-4">
-        <div className="flex justify-around items-center">
+      <td className="px-6 py-4 font-medium text-gray-900">
+        {formatDate(item.updatedAt)}
+      </td>
+
+      <td className="px-6 py-4 sticky right-0 bg-white  shadow-lg ">
+        <div className="flex justify-between items-center">
           <span
             className="font-semibold text-blue-600 dark:text-blue-500 cursor-pointer"
             onClick={() => handleEditProduct(item)}
@@ -41,7 +58,7 @@ export const Product = ({ item, handleEditProduct , handleRemove }) => {
             Edit
           </span>
           <i
-            onClick={()=>handleRemove(item)}
+            onClick={() => handleRemove(item)}
             className="fa-solid fa-circle-xmark fa-lg cursor-pointer"
             style={{ color: "#93969a" }}
           />

@@ -5,6 +5,8 @@ const ProductContext = createContext({
   pagination: { offset: 0, limit: 10 },
   loading: false,
   error: null,
+  addProductLoading : false,
+  deleteLoading : false,
   createProduct: () => {},
   editProduct: () => {},
   deleteProduct: () => {},

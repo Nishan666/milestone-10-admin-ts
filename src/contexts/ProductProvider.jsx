@@ -12,8 +12,12 @@ const ProductProvider = ({ children }) => {
   const [productData, setProductData] = useState(null);
 
   const [pagination, setPagination] = useState({ offset: 0, limit: 10 });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [addProductLoading , setAddProductLoading] = useState(false)
+
+  const [deleteLoading , setDeleteLoading] = useState(false)
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -32,7 +36,7 @@ const ProductProvider = ({ children }) => {
   }, [pagination]);
 
   const createProduct = async (productData) => {
-    setLoading(true);
+    setAddProductLoading(true);
     setError(null);
     const result = await createProducts(productData);
     if (result.error) {
@@ -40,12 +44,12 @@ const ProductProvider = ({ children }) => {
     } else {
       await fetchProducts();
     }
-    setLoading(false);
+    setAddProductLoading(false);
     return result
   };
 
   const editProduct = async (id, productData) => {
-    setLoading(true);
+    setAddProductLoading(true);
     setError(null);
     const result = await editProducts(id, productData);
     if (result.error) {
@@ -53,12 +57,12 @@ const ProductProvider = ({ children }) => {
     } else {
       await fetchProducts();
     }
-    setLoading(false);
+    setAddProductLoading(false);
     return result
   };
 
   const deleteProduct = async (id) => {
-    setLoading(true);
+    setDeleteLoading(true)
     setError(null);
     const result = await deleteProducts(id);
     if (result.error) {
@@ -66,7 +70,7 @@ const ProductProvider = ({ children }) => {
     } else {
       await fetchProducts();
     }
-    setLoading(false);
+    setDeleteLoading(false)
   };
 
   const contextValue = {
@@ -78,6 +82,8 @@ const ProductProvider = ({ children }) => {
     createProduct,
     editProduct,
     deleteProduct,
+    addProductLoading,
+    deleteLoading
   };
 
   return (
