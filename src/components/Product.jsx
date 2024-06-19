@@ -49,8 +49,8 @@ export const Product = ({ item, handleEditProduct, handleRemove }) => {
         {formatDate(item.updatedAt)}
       </td>
 
-      <td className="px-6 py-4 sticky right-0 bg-white  shadow-lg ">
-        <div className="flex justify-between items-center">
+      <td className="px-6 py-4 sticky right-0 -z-10 bg-white  shadow-lg ">
+        <div className="flex justify-around items-center">
           <span
             className="font-semibold text-blue-600 dark:text-blue-500 cursor-pointer"
             onClick={() => handleEditProduct(item)}

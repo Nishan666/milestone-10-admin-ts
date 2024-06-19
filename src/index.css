@@ -5,3 +5,11 @@
 .modal-backdrop {
   @apply fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 z-30;
 }
+
+.disabled-class a {
+  cursor: not-allowed;
+}
+
+.pagination-default {
+  @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium;
+}

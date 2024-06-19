@@ -4,8 +4,6 @@ import { createPortal } from "react-dom";
 const Modal = ({ open, resetFields, children ,deleteData}) => {
   const dialog = useRef();
 
-  console.log(deleteData);
-
   useEffect(() => {
     const dialogElement = dialog.current;
 

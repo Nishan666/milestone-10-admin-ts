@@ -7,12 +7,10 @@ import "react-toastify/dist/ReactToastify.css";
 const App = () => {
   return (
     <>
-      <div>
-        <ToastContainer />
-        <Header />
-        <Products />
-        <Pagination />
-      </div>
+      <ToastContainer />
+      <Header />
+      <Products />
+      <Pagination />
     </>
   );
 };

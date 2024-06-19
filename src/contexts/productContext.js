@@ -11,6 +11,13 @@ const ProductContext = createContext({
   editProduct: () => {},
   deleteProduct: () => {},
   setPagination: () => {},
+  setSearchQuery : () => {},
+  setPriceRange : () => {},
+  setCategory : () => {},
+  category : 0,
+  priceRange : {min : 0 , max : 3000},
+  setSort : () => {},
+  totalCount : 0,
 });
 
 export default ProductContext;

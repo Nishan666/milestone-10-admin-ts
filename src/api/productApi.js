@@ -1,11 +1,23 @@
 import axios from "axios";
 import { resolve } from "./resolver";
 
-const getProducts = async (pagination) => {
+const getProducts = async (pagination, searchQuery = '', priceRange = { min: 0, max: 10000 }, category = '') => {
     const { offset, limit } = pagination;
-    const result = await axios.get(`https://api.escuelajs.co/api/v1/products?offset=${offset}&limit=${limit}`);
+    const { min, max } = priceRange;
+
+    const result = await axios.get('https://api.escuelajs.co/api/v1/products', {
+        params: {
+            offset,
+            limit,
+            title: searchQuery,
+            price_min: min,
+            price_max: max,
+            categoryId: category,
+        },
+    });
     return resolve(result);
-}
+};
+
 
 const createProducts = async (productData) => {
     const result = await axios.post("https://api.escuelajs.co/api/v1/products", productData);
@@ -22,4 +34,20 @@ const deleteProducts = async (id) => {
     return resolve(result);
 }
 
-export { getProducts, createProducts, editProducts, deleteProducts };
+const findLimit = async (limit , searchQuery = '', priceRange = { min: 0, max: 10000 }, category = '') => {
+    const { min, max } = priceRange;
+
+    const result = await axios.get('https://api.escuelajs.co/api/v1/products', {
+        params: {
+            limit,
+            title: searchQuery,
+            price_min: min,
+            price_max: max,
+            categoryId: category,
+        },
+    });
+    const resolvedresult = await resolve(result)
+    return resolvedresult.data.length
+}
+
+export { getProducts, createProducts, editProducts, deleteProducts, findLimit };

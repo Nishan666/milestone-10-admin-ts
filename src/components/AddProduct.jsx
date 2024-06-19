@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-useless-escape */
 import { useContext, useEffect, useState } from "react";
-import { getCategory } from "../api/categoryApi";
+import { getCategories } from "../api/categoryApi";
 import ProductContext from "../contexts/productContext";
 import { postImage } from "../api/imageApi";
 import { toast, Bounce } from "react-toastify";
@@ -15,7 +15,7 @@ export const AddProduct = ({
   resetFields,
 }) => {
   const [categories, setCategories] = useState([]);
-  const { createProduct, editProduct, addProductLoading, error } =
+  const { createProduct, editProduct, addProductLoading, error, setPagination, setCategory : setCategoryContext, setPriceRange, setSearchQuery } =
     useContext(ProductContext);
 
   const [title, setTitle] = useState(editData ? editData.title : "");
@@ -23,6 +23,7 @@ export const AddProduct = ({
   const [category, setCategory] = useState(
     editData && editData.category ? editData.category.name : ""
   );
+
   const [description, setDescription] = useState(
     editData ? editData.description : ""
   );
@@ -39,7 +40,7 @@ export const AddProduct = ({
 
   useEffect(() => {
     const fetchCategory = async () => {
-      const result = await getCategory();
+      const result = await getCategories();
       if (result.error) {
         console.log(result.error);
       } else {
@@ -131,6 +132,13 @@ export const AddProduct = ({
     setEditData(null);
     resetFields();
     resetFields();
+
+    if (!editData) {
+      setPagination((prev) => ({ ...prev, offset: 0 }));
+      setCategoryContext(0)
+      setSearchQuery("")
+      setPriceRange(prev => ({ ...prev, offset: 0 }))
+    }
 
     closeModal();
   };

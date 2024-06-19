@@ -1,126 +1,44 @@
-import { useContext } from "react";
-import ProductContext from "../contexts/productContext";
+import { useContext, useEffect, useState } from 'react';
+import ReactPaginate from 'react-paginate';
+import ProductContext from '../contexts/productContext';
 
 export const Pagination = () => {
-  const { pagination, setPagination } = useContext(ProductContext);
+  const { pagination, setPagination, totalCount: count } = useContext(ProductContext);
   const { offset, limit } = pagination;
-  const currentPage = Math.floor(offset / limit) + 1;
 
-  const changePage = (newPage) => {
+  const [initialPage, setInitialPage] = useState(Math.floor(offset / limit));
+
+  useEffect(() => {
+    setInitialPage(Math.floor(offset / limit));
+  }, [offset, limit]);
+
+  const handlePageClick = (selectedItem) => {
+    const newOffset = selectedItem.selected * limit;
     setPagination((prev) => ({
       ...prev,
-      offset: (newPage - 1) * limit,
+      offset: newOffset,
     }));
-  };
-
-  const renderPageNumbers = () => {
-    const pageNumbers = [];
-    for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-      if (i > 0) {
-        pageNumbers.push(i);
-      }
-    }
-    return pageNumbers;
   };
 
   return (
     <div className="sticky bottom-0 bg-white shadow-xl shadow-black py-2">
-      <nav
-        aria-label="Page navigation example"
-        className="flex justify-center"
-      >
-        <ul className="flex items-center -space-x-px h-10 text-base">
-          {currentPage > 1 && (
-            <li>
-              <a
-                href="#"
-                onClick={() => changePage(currentPage - 1)}
-                className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-900 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                <span className="sr-only">Previous</span>
-                <svg
-                  className="w-3 h-3 rtl:rotate-180"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 6 10"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 1 1 5l4 4"
-                  />
-                </svg>
-              </a>
-            </li>
-          )}
-          {currentPage <= 1 && (
-            <li>
-              <span
-                href="#"
-                className="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-200 bg-white border border-e-0 border-gray-300 rounded-s-lg cursor-default"
-              >
-                <span className="sr-only">Previous</span>
-                <svg
-                  className="w-3 h-3 rtl:rotate-180"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 6 10"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 1 1 5l4 4"
-                  />
-                </svg>
-              </span>
-            </li>
-          )}
-          {renderPageNumbers().map((page) => (
-            <li key={page}>
-              <a
-                href="#"
-                onClick={() => changePage(page)}
-                className={`flex items-center justify-center px-4 h-10 leading-tight ${page === currentPage
-                    ? "text-blue-900 border border-blue-300 bg-blue-50 font-bold"
-                    : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-900 font-bold  "
-                  } dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
-              >
-                {page}
-              </a>
-            </li>
-          ))}
-          <li>
-            <a
-              href="#"
-              onClick={() => changePage(currentPage + 1)}
-              className="flex items-center justify-center px-4 h-10 leading-tight text-gray-900 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              <span className="sr-only">Next</span>
-              <svg
-                className="w-3 h-3 rtl:rotate-180"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 6 10"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m1 9 4-4-4-4"
-                />
-              </svg>
-            </a>
-          </li>
-        </ul>
-      </nav>
+      <ReactPaginate
+        forcePage={initialPage}
+        previousLabel="Previous"
+        nextLabel="Next"
+        breakLabel="..."
+        pageCount={Math.ceil(count / limit)}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageClick}
+        containerClassName="flex justify-center"
+        pageClassName="pagination-default text-gray-700 hover:bg-blue-400"
+        previousClassName="pagination-default text-gray-700 rounded"
+        nextClassName="pagination-default text-gray-700 rounded" 
+        breakClassName="pagination-default bg-white text-gray-700 hover:bg-gray-50"
+        activeClassName="pagination-default bg-blue-500 hover:bg-blue-600"
+        disabledClassName="pagination-default bg-gray-300 text-gray-100 cursor-not-allowed  disabled-class"
+      />
     </div>
   );
 };
