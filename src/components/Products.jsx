@@ -31,14 +31,14 @@ export const Products = () => {
 
   const resetFields = () => {
     setEditData(null);
-    setDeleteData(null)
+    setDeleteData(null);
   };
 
   const handleRemove = async (item) => {
     const result = await deleteProduct(item.id);
     console.log(result);
-    closeModal()
-    setDeleteData(null)
+    closeModal();
+    setDeleteData(null);
     toast.success("Product Deleted", {
       position: "top-right",
       autoClose: 5000,
@@ -64,11 +64,8 @@ export const Products = () => {
   }
 
   if (loading) {
-    return (
-      <TableLoadingSkeleton />
-    );
+    return <TableLoadingSkeleton />;
   }
-
 
   if (productData) {
     return (
@@ -91,12 +88,18 @@ export const Products = () => {
           )}
         </Modal>
 
-
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg my-2 h-[81vh]">
           <table className="w-[100%] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr className="sticky top-0 bg-gray-50">
-                {['id', 'title', 'category', 'price', 'createdDate', 'updatedDate'].map((key) => (
+              <tr className="sticky top-0 bg-gray-50 z-20">
+                {[
+                  "id",
+                  "title",
+                  "category",
+                  "price",
+                  "createdDate",
+                  "updatedDate",
+                ].map((key) => (
                   <th key={key} scope="col" className="px-6 py-3">
                     <span className="flex items-center">
                       {key.charAt(0).toUpperCase() + key.slice(1)}
@@ -117,9 +120,11 @@ export const Products = () => {
                       </button>
                     </span>
                   </th>
-
                 ))}
-                <th scope="col" className="px-6 py-3 flex justify-center sticky top-0 bg-gray-50 shadow-lg z-10 ">
+                <th
+                  scope="col"
+                  className="px-6 py-3 flex justify-center sticky top-0 bg-gray-50 shadow-lg z-20 "
+                >
                   Actions
                 </th>
               </tr>
@@ -135,10 +140,8 @@ export const Products = () => {
               ))}
             </tbody>
           </table>
-
         </div>
-
       </div>
-    )
+    );
   }
-}
+};
