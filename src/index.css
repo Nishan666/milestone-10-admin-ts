@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .modal-backdrop {
-  @apply fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 z-30;
+  @apply fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 z-40;
 }
 
 .disabled-class a {
@@ -11,5 +11,5 @@
 }
 
 .pagination-default {
-  @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium;
+  @apply inline-flex items-center border border-gray-300 text-sm font-medium;
 }

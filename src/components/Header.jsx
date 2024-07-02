@@ -24,7 +24,7 @@ export const Header = () => {
   };
 
   return (
-    <div className="flex justify-between items-center shadow-sm pt-2 pb-1 top-0 sticky bg-white  px-10 z-10">
+    <div className="flex justify-between items-center shadow-sm pt-2 pb-1 top-0 sticky bg-white  px-10 z-30">
       <div><h1 className="font-bold text-3xl">List Of Products</h1></div>
       <div className="flex items-center justify-center gap-4">
 

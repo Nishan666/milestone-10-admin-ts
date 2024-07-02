@@ -95,10 +95,10 @@ export const Products = () => {
                 {[
                   "id",
                   "title",
-                  "category",
+                  "category", 
                   "price",
-                  "createdDate",
-                  "updatedDate",
+                  "created Date",
+                  "updated Date",
                 ].map((key) => (
                   <th key={key} scope="col" className="px-6 py-3">
                     <span className="flex items-center">
@@ -123,7 +123,7 @@ export const Products = () => {
                 ))}
                 <th
                   scope="col"
-                  className="px-6 py-3 flex justify-center sticky top-0 bg-gray-50 shadow-lg z-20 "
+                  className="px-6 py-3 flex justify-center sticky right-0 top-0 bg-gray-50 shadow-lg z-20 "
                 >
                   Actions
                 </th>
