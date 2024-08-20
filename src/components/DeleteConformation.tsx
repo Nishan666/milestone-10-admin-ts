@@ -1,8 +1,14 @@
 import { useContext } from "react";
 import ProductContext from "../contexts/productContext";
+import { ProductDataProps } from "./Product.types";
 
-/* eslint-disable react/prop-types */
-export const DeleteConfirmation = ({ item, handleConfirm, handleCancel }) => {
+export interface DeleteConfirmationProps{
+    item : ProductDataProps;
+    handleConfirm : (item: ProductDataProps) => void;
+    handleCancel : () => void
+  }
+
+export const DeleteConfirmation = ({ item, handleConfirm, handleCancel }  : DeleteConfirmationProps) => {
     const { deleteLoading } = useContext(ProductContext)
     return (
         <div className="p-4">

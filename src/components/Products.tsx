@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Product } from "./Product";
 import ProductContext from "../contexts/productContext";
 import Modal from "./Modal";
@@ -9,50 +9,53 @@ import { toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import TableLoadingSkeleton from "./TableLoadingSkeleton";
 import { DeleteConfirmation } from "./DeleteConformation";
+import { ProductDataProps , SortState } from "./Product.types";
 
 export const Products = () => {
   const { productData, loading, error, deleteProduct, setSort } =
     useContext(ProductContext);
   const { closeModal, openModal, modal } = useContext(ModalContext);
 
-  const [editData, setEditData] = useState(null);
+  const [editData, setEditData] = useState<ProductDataProps | null>(null);
 
-  const [deleteData, setDeleteData] = useState(null);
+  const [deleteData, setDeleteData] = useState<ProductDataProps | null>(null);
 
-  const handleEditProduct = (item) => {
+  const handleEditProduct = (item: ProductDataProps): void => {
     setEditData(item);
     openModal();
   };
 
-  const handleDeleteProduct = (item) => {
+  const handleDeleteProduct = (item: ProductDataProps): void => {
     setDeleteData(item);
     openModal();
   };
 
-  const resetFields = () => {
+  const resetFields = useCallback(() => {
     setEditData(null);
     setDeleteData(null);
+  }, []);
+
+  const handleRemove = async (item: ProductDataProps): Promise<void> => {
+    if (item.id) {
+      const result = await deleteProduct(item.id);
+      console.log(result);
+      closeModal();
+      setDeleteData(null);
+      toast.success("Product Deleted", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    }
   };
 
-  const handleRemove = async (item) => {
-    const result = await deleteProduct(item.id);
-    console.log(result);
-    closeModal();
-    setDeleteData(null);
-    toast.success("Product Deleted", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-    });
-  };
-
-  const handleSort = (key) => {
+  const handleSort = (key: keyof ProductDataProps) => {
     setSort((prevSort) => ({
       key,
       ascending: prevSort.key === key ? !prevSort.ascending : true,
@@ -95,7 +98,7 @@ export const Products = () => {
                 {[
                   "id",
                   "title",
-                  "category", 
+                  "category",
                   "price",
                   "created Date",
                   "updated Date",
@@ -105,7 +108,7 @@ export const Products = () => {
                       {key.charAt(0).toUpperCase() + key.slice(1)}
                       <button
                         type="button"
-                        onClick={() => handleSort(key)}
+                        onClick={() => handleSort(key as keyof ProductDataProps)}
                         className="ml-1.5 focus:outline-none"
                       >
                         <svg

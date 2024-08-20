@@ -1,41 +1,55 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-useless-escape */
-import { useContext, useEffect, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import { getCategories } from "../api/categoryApi";
-import ProductContext from "../contexts/productContext";
+import ProductContext, { ProductContextType } from "../contexts/productContext";
 import { postImage } from "../api/imageApi";
 import { toast, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  AddProductProps,
+  ProductDataProps,
+  CategoryProps,
+} from "./Product.types";
 
 /* eslint-disable react/prop-types */
-export const AddProduct = ({
+export const AddProduct: React.FC<AddProductProps> = ({
   closeModal,
   editData,
   setEditData,
   resetFields,
 }) => {
-  const [categories, setCategories] = useState([]);
-  const { createProduct, editProduct, addProductLoading, error, setPagination, setCategory : setCategoryContext, setPriceRange, setSearchQuery } =
-    useContext(ProductContext);
+  const [categories, setCategories] = useState<CategoryProps[]>([]);
+  const {
+    createProduct,
+    editProduct,
+    addProductLoading,
+    error,
+    setPagination,
+    setCategory: setCategoryContext,
+    setPriceRange,
+    setSearchQuery,
+  } = useContext(ProductContext) as ProductContextType;
 
-  const [title, setTitle] = useState(editData ? editData.title : "");
-  const [price, setPrice] = useState(editData ? editData.price : "");
+  const [title, setTitle] = useState(() => editData?.title || "");
+  const [price, setPrice] = useState(() => editData?.price || "");
   const [category, setCategory] = useState(
-    editData && editData.category ? editData.category.name : ""
+    () => editData?.category?.name || ""
   );
-
   const [description, setDescription] = useState(
-    editData ? editData.description : ""
+    () => editData?.description || ""
   );
 
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
 
-  const cleanUrlString = (url) => {
+  const cleanUrlString = (url: String) => {
     return url.replace(/^\[\"|\"\]$/g, "");
   };
 
-  const [fileUrl, setFileUrl] = useState(
-    editData ? cleanUrlString(editData.images[0]) : ""
+  const [fileUrl, setFileUrl] = useState<string>(
+    editData && editData.images && editData.images.length > 0
+      ? cleanUrlString(editData.images[0])
+      : ""
   );
 
   useEffect(() => {
@@ -44,15 +58,15 @@ export const AddProduct = ({
       if (result.error) {
         console.log(result.error);
       } else {
-        setCategories(result.data);
+        setCategories(result.data || []);
       }
     };
     fetchCategory();
   }, []);
 
-
-
-  const handleImageUpload = async (file) => {
+  const handleImageUpload = async (
+    file: File | null
+  ): Promise<string | null> => {
     if (file) {
       const formData = new FormData();
       formData.append("file", file);
@@ -69,58 +83,75 @@ export const AddProduct = ({
     return null;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let imageUrl = fileUrl;
+    let imageUrl: string = fileUrl ?? "";
 
     if (file && !fileUrl) {
-      imageUrl = await handleImageUpload(file);
-      if (!imageUrl) {
+      const uploadedUrl = await handleImageUpload(file);
+      if (uploadedUrl) {
+        imageUrl = uploadedUrl;
+      } else {
+        console.error("Image upload failed");
         return;
       }
-    }
 
-    const selectedCategory = categories.find((cat) => cat.name === category);
-    const categoryId = selectedCategory ? selectedCategory.id : null;
+      const selectedCategory = categories.find((cat) => cat.name === category);
+      const categoryId = selectedCategory ? selectedCategory.id : null;
 
-    const productData = {
-      title,
-      price: parseFloat(price),
-      categoryId,
-      description,
-      images: imageUrl
-        ? [imageUrl]
-        : ["https://www.caspianpolicy.org/no-image.png"],
-    };
+      const numericPrice =
+        typeof price === "string" ? parseFloat(price) : price;
 
-    let result = null;
-    if (editData) {
-      result = await editProduct(editData.id, productData);
-      toast.success("Edit Successful", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } else {
-      result = await createProduct(productData);
-      toast.success(`Product ID : ${result.data.id}`, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      const productData = {
+        title,
+        price: numericPrice,
+        categoryId,
+        description,
+        images: imageUrl
+          ? [imageUrl]
+          : ["https://www.caspianpolicy.org/no-image.png"],
+      };
+
+      try {
+        let result;
+
+        if (editData && editData.id !== undefined) {
+          // Only proceed if `editData.id` is defined
+          result = await editProduct(editData.id, productData);
+
+          toast.success("Edit Successful", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        } else {
+          // Handle case where `editData.id` is not defined
+          result = await createProduct(productData);
+          if (result?.id) {
+            toast.success(`Product ID: ${result.id}`, {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
+          }
+        }
+      } catch (error) {
+        toast.error("Operation failed");
+        console.error("Product operation error:", error);
+      }
     }
 
     setTitle("");
@@ -135,9 +166,9 @@ export const AddProduct = ({
 
     if (!editData) {
       setPagination((prev) => ({ ...prev, offset: 0 }));
-      setCategoryContext(0)
-      setSearchQuery("")
-      setPriceRange(prev => ({ ...prev, offset: 0 }))
+      setCategoryContext(0);
+      setSearchQuery("");
+      setPriceRange((prev) => ({ ...prev, offset: 0 }));
     }
 
     closeModal();
@@ -151,12 +182,11 @@ export const AddProduct = ({
     <>
       <header className="bg-gray-100 h-10 flex justify-between items-center px-3 mb-2">
         <span></span>
-        {editData ?
+        {editData ? (
           <h1 className="text-lg font-bold text-gray-700 ps-5">Edit Product</h1>
-          :
+        ) : (
           <h1 className="text-lg font-bold text-gray-700 ps-5">Add Product</h1>
-
-        }
+        )}
         <button onClick={closeModal}>
           <i
             className="fa-solid fa-circle-xmark fa-lg"
@@ -280,13 +310,12 @@ export const AddProduct = ({
                 className="rounded-full w-14 h-14 object-cover"
               />
               <button
-                onClick={() => (fileUrl === "" ? setFile(null) : setFileUrl(""))}
+                onClick={() =>
+                  fileUrl === "" ? setFile(null) : setFileUrl("")
+                }
                 className="text-sm text-gray-600 hover:text-gray-900 focus:outline-none"
               >
-                <i
-                  className="fa-solid fa-xmark"
-                  style={{ color: "#c01c28" }}
-                />
+                <i className="fa-solid fa-xmark" style={{ color: "#c01c28" }} />
               </button>
             </div>
           </>
@@ -331,7 +360,14 @@ export const AddProduct = ({
               </div>
               <input
                 id="dropzone-file"
-                onChange={(e) => setFile(e.target.files[0])}
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (files && files.length > 0) {
+                    setFile(files[0]);
+                  } else {
+                    setFile(null);
+                  }
+                }}
                 type="file"
                 className="hidden"
               />
@@ -340,31 +376,35 @@ export const AddProduct = ({
         )}
 
         <div className="flex justify-end">
-          {!addProductLoading ? (<button
-            type="submit"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Save
-          </button>) : (<div className="mx-6">
-            <div role="status">
-              <svg
-                aria-hidden="true"
-                className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                viewBox="0 0 100 101"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                  fill="currentFill"
-                />
-              </svg>
+          {!addProductLoading ? (
+            <button
+              type="submit"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              Save
+            </button>
+          ) : (
+            <div className="mx-6">
+              <div role="status">
+                <svg
+                  aria-hidden="true"
+                  className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                  viewBox="0 0 100 101"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                    fill="currentColor"
+                  />
+                  <path
+                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                    fill="currentFill"
+                  />
+                </svg>
+              </div>
             </div>
-          </div>)}
+          )}
         </div>
       </form>
     </>

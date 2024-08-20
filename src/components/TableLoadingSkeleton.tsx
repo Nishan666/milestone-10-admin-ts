@@ -2,7 +2,7 @@
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-const TableLoadingSkeleton = ({ numRows = 10, numCols = 7 }) => {
+const TableLoadingSkeleton = ({ numRows  = 10, numCols  = 7 }) => {
   const renderSkeletonRows = () => {
     return [...Array(numRows)].map((_, rowIndex) => (
       <tr key={rowIndex}>
@@ -11,7 +11,7 @@ const TableLoadingSkeleton = ({ numRows = 10, numCols = 7 }) => {
     ));
   };
 
-  const renderSkeletonCells = (numCols) => {
+  const renderSkeletonCells = (numCols : number) => {
     return [...Array(numCols)].map((_, colIndex) => (
       <td key={colIndex} className="px-6 py-6">
         <Skeleton width={getSkeletonWidth(colIndex)} height={10} />
@@ -19,7 +19,7 @@ const TableLoadingSkeleton = ({ numRows = 10, numCols = 7 }) => {
     ));
   };
 
-  const getSkeletonWidth = (index) => {
+  const getSkeletonWidth = (index : number) => {
     // Adjust the widths based on your specific column requirements
     switch (index) {
       case 0: return 20; // Id column width

@@ -16,7 +16,7 @@ export const Pagination = () => {
     setInitialPage(Math.floor(offset / limit));
   }, [offset, limit]);
 
-  const handlePageClick = (selectedItem) => {
+  const handlePageClick = (selectedItem: { selected: number; }) => {
     const newOffset = selectedItem.selected * limit;
     setPagination((prev) => ({
       ...prev,

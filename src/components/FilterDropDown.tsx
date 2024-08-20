@@ -1,27 +1,37 @@
 /* eslint-disable react/prop-types */
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { getCategories } from "../api/categoryApi";
+
+export interface FilterDropdownProps {
+  handlePriceFilter: (priceRange: { min: number; max: number }) => void;
+  handleCategoryChange: (categoryId: number) => void;
+  category: number;
+  priceRange: {
+    min: number;
+    max: number;
+  };
+}
 
 const FilterDropdown = ({
   handlePriceFilter,
   handleCategoryChange,
   category,
   priceRange,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [minPrice, setMinPrice] = useState(priceRange.min);
-  const [maxPrice, setMaxPrice] = useState(priceRange.max);
-  const [selectedCategory, setSelectedCategory] = useState(category);
+} : FilterDropdownProps) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [minPrice, setMinPrice] = useState<number>(priceRange.min);
+  const [maxPrice, setMaxPrice] = useState<number>(priceRange.max);
+  const [selectedCategory, setSelectedCategory] = useState<number>(category);
 
-  const [filterCount, setFilterCount] = useState(0);
+  const [filterCount, setFilterCount] = useState<number>(0);
 
-  const fetchCategory = async () => {
+  const fetchCategory = async () : Promise<void> => {
     const result = await getCategories();
     if (result.error) {
       console.log(result.error);
     } else {
-      setCategories(result.data);
+      setCategories(result.data || []);
     }
   };
 
@@ -68,14 +78,14 @@ const FilterDropdown = ({
     handleCategoryChange(0);
   };
 
-  const handleMinSliderChange = (event) => {
+  const handleMinSliderChange = (event : ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10);
     if (value <= maxPrice) {
       setMinPrice(value);
     }
   };
 
-  const handleMaxSliderChange = (event) => {
+  const handleMaxSliderChange = (event : ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10);
     if (value >= minPrice) {
       setMaxPrice(value);
@@ -174,7 +184,7 @@ const FilterDropdown = ({
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Category
                 <select
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={(e :ChangeEvent<HTMLSelectElement> ) => setSelectedCategory(parseInt(e.target.value, 10))}
                   value={selectedCategory}
                   aria-label="Category"
                   className="block w-full mt-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
